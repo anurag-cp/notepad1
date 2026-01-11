@@ -3,165 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Life Notepad with Emotion Detection</title>
+    <title>Mind Ease AI - Emotion Journal</title>
     <style>
+        :root {
+            --bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --bg-secondary: rgba(255,255,255,0.1);
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --glass-bg: rgba(255,255,255,0.25);
+            --border-glass: rgba(255,255,255,0.18);
+            --shadow: 0 25px 45px rgba(0,0,0,0.1);
+        }
+        [data-theme="dark"] {
+            --bg-primary: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            --bg-secondary: rgba(0,0,0,0.3);
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --glass-bg: rgba(0,0,0,0.4);
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
             min-height: 100vh;
             padding: 20px;
+            transition: all 0.3s ease;
         }
         .container {
-            max-width: 900px;
+            max-width: 1000px;
             margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid var(--border-glass);
+            box-shadow: var(--shadow);
             overflow: hidden;
+            animation: slideUp 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
-        .header {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-        .header h1 { font-size: 2em; margin-bottom: 10px; }
-        .input-section {
-            padding: 30px;
-            border-bottom: 1px solid #eee;
-        }
-        .input-group {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-        input, textarea, select {
-            padding: 12px;
-            border: 2px solid #e1e5e9;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: #4facfe;
-        }
-        input, select { flex: 1; min-width: 150px; }
-        textarea { flex: 2; min-height: 100px; resize: vertical; }
-        .add-btn {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: transform 0.2s;
-        }
-        .add-btn:hover { transform: translateY(-2px); }
-        .emotion-preview {
-            margin-top: 15px;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: bold;
-            text-align: center;
-            min-height: 20px;
-        }
-        .notes-section {
-            max-height: 600px;
-            overflow-y: auto;
-        }
-        .note-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 15px;
-            padding: 20px;
-            border-bottom: 1px solid #f0f0f0;
-            transition: background 0.2s;
-            animation: slideIn 0.3s ease-out;
-        }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(20px); }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .note-item:hover { background: #f8f9ff; }
-        .note-category {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            min-width: 70px;
+        .header {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(20px);
+            padding: 30px;
             text-align: center;
-            color: white;
+            position: relative;
+            overflow: hidden;
         }
-        .note-content {
-            flex: 1;
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
         }
-        .note-title { font-weight: bold; margin-bottom: 8px; color: #333; font-size: 1.1em; }
-        .note-text { color: #555; line-height: 1.6; margin-bottom: 8px; }
-        .note-meta {
-            display: flex;
-            gap: 15px;
-            font-size: 12px;
-            color: #888;
-            margin-top: 8px;
+        .header:hover::before { left: 100%; }
+        .logo { font-size: 2.5em; font-weight: 800; background: linear-gradient(45deg, #fff, #f0f9ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
+        .tagline { color: var(--text-secondary); font-size: 1.1em; }
+        .input-section { padding: 40px; border-bottom: 1px solid var(--border-glass); }
+        .input-grid { display: grid; grid-template-columns: 1fr 1fr 2fr auto; gap: 20px; align-items: end; }
+        .quick-moods { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+        .quick-mood { 
+            width: 56px; height: 56px; border-radius: 16px; 
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5em; cursor: pointer; border: none;
+            transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            backdrop-filter: blur(10px);
         }
-        .note-date { font-family: monospace; }
-        .note-actions {
-            display: flex;
-            gap: 8px;
+        .quick-mood:hover { transform: scale(1.1) rotate(5deg); }
+        input, textarea, select {
+            padding: 16px 20px; border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 16px; font-size: 16px; background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px); color: var(--text-primary);
+            transition: all 0.3s ease;
         }
-        .edit-btn, .delete-btn {
-            padding: 8px 14px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: bold;
-            transition: transform 0.2s;
+        input:focus, textarea:focus, select:focus {
+            outline: none; border-color: #4facfe; box-shadow: 0 0 0 4px rgba(79, 172, 254, 0.1);
+            background: rgba(255,255,255,0.2);
         }
-        .edit-btn:hover, .delete-btn:hover { transform: scale(1.05); }
-        .edit-btn { background: #ffd93d; color: #333; }
-        .delete-btn { background: #ff6b6b; color: white; }
-        .stats {
-            padding: 20px 30px;
-            background: #f8f9fa;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
+        textarea { resize: vertical; min-height: 120px; }
+        .btn-primary {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white; border: none; padding: 16px 32px;
+            border-radius: 16px; cursor: pointer; font-size: 16px; font-weight: 600;
+            transition: all 0.2s; position: relative; overflow: hidden;
         }
-        .emotion-stats {
-            display: flex;
-            gap: 20px;
-            font-size: 14px;
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3); }
+        .btn-primary:active { transform: scale(0.98); }
+        .emotion-preview {
+            grid-column: 1 / -1; padding: 16px 20px; border-radius: 16px;
+            font-weight: 600; text-align: center; min-height: 24px;
+            backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2);
         }
-        .emotion-stat {
-            padding: 8px 16px;
-            border-radius: 20px;
-            color: white;
-            font-weight: bold;
+        .notes-section { max-height: 600px; overflow-y: auto; padding: 20px; }
+        .note-item {
+            background: var(--glass-bg); backdrop-filter: blur(15px);
+            border-radius: 20px; margin-bottom: 16px; padding: 24px;
+            border: 1px solid var(--border-glass); transition: all 0.3s ease;
+            animation: slideInUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
-        @media (max-width: 700px) {
-            .input-group { flex-direction: column; }
-            .note-item { flex-direction: column; gap: 12px; }
-            .stats { flex-direction: column; text-align: center; }
+        .note-item:hover {
+            transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .note-header { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 12px; }
+        .emotion-badge {
+            padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 700;
+            color: white; min-width: 80px; text-align: center;
+        }
+        .note-title { font-size: 1.3em; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+        .note-text { color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .note-meta { display: flex; gap: 20px; font-size: 14px; color: var(--text-secondary); }
+        .note-advice {
+            background: rgba(254, 243, 199, 0.5); padding: 16px; border-radius: 12px;
+            margin-top: 16px; font-style: italic; backdrop-filter: blur(10px);
+            border-left: 4px solid #f59e0b;
+        }
+        .stats-grid {
+            padding: 30px; background: var(--glass-bg); backdrop-filter: blur(20px);
+            display: grid; grid-template-columns: 1fr auto 1fr; gap: 20px; align-items: center;
+        }
+        .theme-toggle { background: none; border: 1px solid var(--border-glass); color: var(--text-primary); padding: 12px; border-radius: 12px; cursor: pointer; }
+        .streak-ring {
+            width: 60px; height: 60px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 18px;
+        }
+        @media (max-width: 768px) {
+            .input-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr; text-align: center; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container" id="container">
         <div class="header">
-            <h1>📝 Emotion-Aware Daily Notepad</h1>
-            <p>Track daily life + automatic emotion detection</p>
+            <div class="logo">🧠 Mind Ease AI</div>
+            <div class="tagline">Your AI Emotion Journal & Wellness Companion</div>
         </div>
         
         <div class="input-section">
-            <div class="input-group">
-                <input type="text" id="noteTitle" placeholder="What's happening today?">
+            <div class="quick-moods">
+                <button class="quick-mood" style="background: #10b981;" onclick="quickNote('😊 Great day! Feeling positive')">😊</button>
+                <button class="quick-mood" style="background: #f59e0b;" onclick="quickNote('😡 Frustrated today')">😡</button>
+                <button class="quick-mood" style="background: #ef4444;" onclick="quickNote('😢 Feeling down')">😢</button>
+                <button class="quick-mood" style="background: #6b7280;" onclick="quickNote('😰 Anxious')">😰</button>
+            </div>
+            <div class="input-grid">
+                <input type="text" id="noteTitle" placeholder="What's on your mind?">
                 <select id="noteCategory">
                     <option value="Daily">Daily Life</option>
                     <option value="Work">Work</option>
@@ -169,85 +166,88 @@
                     <option value="Family">Family</option>
                     <option value="Mood">Mood Check</option>
                 </select>
-                <textarea id="noteText" placeholder="Write your thoughts... (emotion detected automatically)" 
-                          oninput="previewEmotion()"></textarea>
-                <button class="add-btn" onclick="addNote()">➕ Add Note</button>
+                <textarea id="noteText" placeholder="Write freely... AI analyzes emotions & gives advice" oninput="previewEmotion()"></textarea>
+                <button class="btn-primary" onclick="addNote()">✨ Add Note</button>
+                <div id="emotionPreview" class="emotion-preview">Start typing for AI insights...</div>
             </div>
-            <div id="emotionPreview" class="emotion-preview">Start typing to see emotion...</div>
         </div>
         
         <div class="notes-section" id="notesContainer"></div>
         
-        <div class="stats">
+        <div class="stats-grid">
             <div>
-                <span id="totalNotes">Total: 0</span> | 
-                <span id="todayNotes">Today: 0</span>
+                <div id="totalNotes" style="font-size: 24px; font-weight: 700;">Total: 0</div>
+                <div id="todayNotes" style="color: var(--text-secondary);">Today: 0</div>
             </div>
-            <div class="emotion-stats" id="emotionStats"></div>
-            <button class="add-btn" onclick="clearAllNotes()" style="padding: 10px 20px;">🗑️ Clear All</button>
+            <div class="streak-ring" style="background: conic-gradient(#10b981 0deg 0deg, #6b7280 0deg 360deg); border-radius: 50%; box-shadow: inset 0 0 0 2px rgba(255,255,255,0.3);" id="streakRing">7🔥</div>
+            <div style="text-align: right;">
+                <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+                <button class="btn-primary" onclick="exportNotes()" style="margin-top: 12px;">💾 Backup</button>
+            </div>
         </div>
     </div>
 
     <script>
-        let notes = JSON.parse(localStorage.getItem('emotionNotes')) || [];
+        let notes = JSON.parse(localStorage.getItem('mindEaseNotes')) || [];
         let editIndex = -1;
+        let currentStreak = 0;
 
         const emotionKeywords = {
-            happy: ['happy', 'great', 'awesome', 'love', 'excited', 'blessed', 'grateful', 'amazing', 'wonderful',
-             'joy', 'smile','joyful', 'cheerful', 'delighted', 'ecstatic', 'elated', 
-              'excited', 'thrilled', 'glad', 'pleased', 'content','blissful', 'euphoric', 'overjoyed', 'gleeful', 'merry',
-            'jolly', 'jovial', 'upbeat', 'buoyant', 'radiant','sunny', 'smiling', 'grateful', 'blessed', 'contented',
-            'satisfied', 'lighthearted', 'festive', 'jubilant', 'exultant','mirthful', 'chipper', 'perky', 'peppy', 'sprightly', 
-            'vivacious', 'lively', 'bright', 'hopeful', 'optimistic','enthusiastic', 'rapturous', 'enraptured', 'exhilarated', 
-            'exuberant', 'charmed', 'content', 'gratified', 'fulfilled','serene', 'peaceful', 'heartwarming'],
-            sad: ['sad', 'depressed', 'crying', 'hurt', 'lonely', 'tired', 'down', 'upset', 'broken', 'pain','sad', 'unhappy', 
-            'depressed', 'miserable', 'down', 'blue', 'gloomy', 
-                'melancholy', 'heartbroken', 'grieving', 'bereaved', 'despairing',
-                'despondent', 'disconsolate', 'distressed', 'doleful', 'downcast',
-                'forlorn', 'glum', 'grief-stricken', 'heartsick', 'heavy-hearted',
-                'hurting', 'inconsolable', 'low-spirited', 'morose', 'pensive',
-                'wistful', 'woebegone', 'woeful', 'sorrowful', 
-                'upset', 'broken-hearted', 'devastated', 'distraught', 'low',
-                'tearful', 'weeping', 'anguished', 'bitter', 'languishing',
-                'lugubrious', 'morbid', 'regretful', 'wretched', 'grim',
-                'somber', 'bleak', 'disheartened'],
-            angry: ['angry', 'hate', 'furious', 'annoyed', 'stupid', 'mad', 'frustrated', 'irritated', 'rage'],
-            anxious: ['worried', 'stress', 'anxiety', 'scared', 'fear', 'panic', 'nervous', 'tense', 'overwhelmed'],
-            neutral: ['ok', 'fine', 'normal', 'regular', 'average', 'standard']
+            happy: ['happy','great','awesome','love','excited','blessed','grateful','amazing','wonderful','joy','smile','laugh','fun','success','proud','mazza','achha','khushi','pyaar'],
+            sad: ['sad','depressed','crying','hurt','lonely','tired','down','upset','broken','pain','😢'],
+            angry: ['angry','furious','mad','enraged','livid','annoyed','frustrated','irritated','pissed','hate','😡'],
+            anxious: ['worried','stress','anxiety','scared','fear','panic','nervous','tense','overwhelmed','😰']
         };
 
         const emotionColors = {
-            happy: '#10b981',
-            sad: '#ef4444', 
-            angry: '#f59e0b',
-            anxious: '#6b7280',
-            neutral: '#9ca3af'
+            happy: '#10b981', sad: '#ef4444', angry: '#f59e0b', anxious: '#6b7280', neutral: '#9ca3af'
+        };
+
+        const adviceBank = {
+            happy: ["✨ Keep nurturing this positivity!", "🌟 What made you feel this way?", "😊 Share this joy with someone!", "🎉 Celebrate these moments!"],
+            sad: ["🤗 It's okay to feel this way.", "💙 Try 3 things you're grateful for.", "🌧️ This will pass. Breathe deeply.", "🫂 Reach out to someone you trust."],
+            angry: ["🔥 Take 3 deep breaths first.", "⚡ Step away for 5 minutes.", "💪 Channel this into action.", "🧘‍♂️ Try 4-7-8 breathing now."],
+            anxious: ["🧠 You're safe right now.", "☀️ Name 5 things you see.", "🌿 One step at a time.", "💫 You've handled this before."]
         };
 
         function detectEmotion(text) {
             if (!text) return 'neutral';
             const lowerText = text.toLowerCase();
-            let scores = {};
+            let scores = { happy: 0, sad: 0, angry: 0, anxious: 0, neutral: 0 };
             
             for (let emotion in emotionKeywords) {
-                scores[emotion] = emotionKeywords[emotion].filter(word => 
-                    lowerText.includes(word)).length;
+                scores[emotion] = emotionKeywords[emotion].filter(word => lowerText.includes(word)).length;
             }
-            
             return Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+        }
+
+        function generateAdvice(note) {
+            const emotion = note.emotion;
+            let advice = adviceBank[emotion][Math.floor(Math.random() * adviceBank[emotion].length)];
+            
+            if (note.text.toLowerCase().includes('work') || note.text.toLowerCase().includes('boss')) {
+                advice = "💼 Work stress? Set one boundary today. " + advice;
+            }
+            return advice;
         }
 
         function previewEmotion() {
             const text = document.getElementById('noteText').value;
             const emotion = detectEmotion(text);
             const preview = document.getElementById('emotionPreview');
-            preview.textContent = `Detected: ${emotion.toUpperCase()} 😊`;
-            preview.style.background = emotionColors[emotion];
-            preview.style.color = 'white';
+            preview.innerHTML = `AI detected: <strong style="color: ${emotionColors[emotion]}">${emotion.toUpperCase()}</strong> 😊`;
+            preview.style.borderColor = emotionColors[emotion];
+            preview.style.background = emotionColors[emotion] + '20';
+        }
+
+        function quickNote(quickText) {
+            document.getElementById('noteText').value = quickText;
+            previewEmotion();
+            document.getElementById('noteText').focus();
         }
 
         function saveNotes() {
-            localStorage.setItem('emotionNotes', JSON.stringify(notes));
+            localStorage.setItem('mindEaseNotes', JSON.stringify(notes));
             updateStats();
             renderNotes();
         }
@@ -257,89 +257,60 @@
             const category = document.getElementById('noteCategory').value;
             const text = document.getElementById('noteText').value.trim();
 
-            if (!title && !text) {
-                alert('Please add title or text!');
-                return;
-            }
+            if (!title && !text) return alert('Please write something!');
 
             const emotion = detectEmotion(text);
             const note = {
                 id: Date.now(),
-                title: title || 'Untitled',
-                category,
-                text,
-                emotion,
+                title: title || 'Quick Note',
+                category, text, emotion,
+                advice: generateAdvice({text, emotion}),
                 date: new Date().toLocaleString('en-IN', {
-                    weekday: 'short',
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
+                    weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
                 }),
                 created: new Date().toDateString()
             };
 
             if (editIndex >= 0) {
-                notes[editIndex] = note;
-                editIndex = -1;
-                document.querySelector('.add-btn').textContent = '➕ Add Note';
+                notes[editIndex] = note; editIndex = -1;
+                document.querySelector('.btn-primary').textContent = '✨ Add Note';
             } else {
                 notes.unshift(note);
+                updateStreak();
             }
 
-            // Clear form
             document.getElementById('noteTitle').value = '';
             document.getElementById('noteText').value = '';
             document.getElementById('noteCategory').value = 'Daily';
-            document.getElementById('emotionPreview').textContent = 'Start typing to see emotion...';
-            document.getElementById('emotionPreview').style.background = '';
-            
+            document.getElementById('emotionPreview').textContent = 'Start typing for AI insights...';
             saveNotes();
         }
 
-        function editNote(index) {
-            const note = notes[index];
-            document.getElementById('noteTitle').value = note.title;
-            document.getElementById('noteCategory').value = note.category;
-            document.getElementById('noteText').value = note.text;
-            editIndex = index;
-            document.querySelector('.add-btn').textContent = '✏️ Update';
-            previewEmotion();
-        }
-
-        function deleteNote(index) {
-            if (confirm('Delete this note?')) {
-                notes.splice(index, 1);
-                saveNotes();
-            }
-        }
-
-        function clearAllNotes() {
-            if (confirm('Clear ALL notes?')) {
-                notes = [];
-                saveNotes();
-            }
+        function updateStreak() {
+            const today = new Date().toDateString();
+            const yesterday = new Date(Date.now() - 86400000).toDateString();
+            const recentNotes = notes.filter(n => n.created === today || n.created === yesterday);
+            currentStreak = recentNotes.length >= 2 ? currentStreak + 1 : 1;
         }
 
         function renderNotes() {
-            const container = document.getElementById('notesContainer');
-            container.innerHTML = notes.map((note, index) => `
+            document.getElementById('notesContainer').innerHTML = notes.map((note, index) => `
                 <div class="note-item">
-                    <div class="note-category" style="background: ${emotionColors[note.emotion]}">
-                        ${note.emotion.toUpperCase()}
-                    </div>
-                    <div class="note-content">
-                        <div class="note-title">${note.title}</div>
-                        <div class="note-text">${note.text}</div>
-                        <div class="note-meta">
-                            <span>${note.category}</span>
-                            <span class="note-date">${note.date}</span>
+                    <div class="note-header">
+                        <div class="emotion-badge" style="background: ${emotionColors[note.emotion]}">
+                            ${note.emotion.toUpperCase()}
+                        </div>
+                        <div style="flex: 1;">
+                            <div class="note-title">${note.title}</div>
+                            <div style="font-size: 14px; color: var(--text-secondary);">${note.category} • ${note.date}</div>
                         </div>
                     </div>
-                    <div class="note-actions">
-                        <button class="edit-btn" onclick="editNote(${index})">Edit</button>
-                        <button class="delete-btn" onclick="deleteNote(${index})">Delete</button>
+                    <div class="note-text">${note.text}</div>
+                    <div class="note-advice">💡 ${note.advice}</div>
+                    <div style="margin-top: 16px; display: flex; gap: 12px;">
+                        <button class="btn-primary" style="padding: 8px 16px; font-size: 14px;" onclick="editNote(${index})">Edit</button>
+                        <button onclick="deleteNote(${index})" style="background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer;">Delete</button>
                     </div>
                 </div>
             `).join('');
@@ -348,30 +319,41 @@
         function updateStats() {
             const total = notes.length;
             const today = notes.filter(n => n.created === new Date().toDateString()).length;
-            
             document.getElementById('totalNotes').textContent = `Total: ${total}`;
             document.getElementById('todayNotes').textContent = `Today: ${today}`;
-
-            // Emotion stats
-            const emotionCount = {};
-            notes.forEach(note => {
-                emotionCount[note.emotion] = (emotionCount[note.emotion] || 0) + 1;
-            });
-            
-            const statsContainer = document.getElementById('emotionStats');
-            statsContainer.innerHTML = Object.entries(emotionCount).map(([emotion, count]) => 
-                `<div class="emotion-stat" style="background: ${emotionColors[emotion]}">
-                    ${emotion[0].toUpperCase()}: ${count}
-                </div>`
-            ).join('');
+            document.getElementById('streakRing').textContent = `${Math.min(currentStreak, 30)}🔥`;
+            document.getElementById('streakRing').style.background = `conic-gradient(#10b981 0deg ${currentStreak*12}deg, #6b7280 ${currentStreak*12}deg 360deg)`;
         }
 
-        // Keyboard shortcuts
+        function toggleTheme() {
+            const isDark = document.body.getAttribute('data-theme') === 'dark';
+            document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            document.querySelector('.theme-toggle').textContent = isDark ? '☀️' : '🌙';
+            localStorage.setItem('mindEaseTheme', isDark ? 'light' : 'dark');
+        }
+
+        function exportNotes() {
+            const dataStr = JSON.stringify(notes, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url; link.download = `mind-ease-backup-${new Date().toISOString().slice(0,10)}.json`;
+            link.click();
+        }
+
+        // Event listeners
         document.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && e.ctrlKey) addNote();
         });
 
-        // Load everything
+        // Load theme
+        if (localStorage.getItem('mindEaseTheme') === 'dark') {
+            document.body.setAttribute('data-theme', 'dark');
+            document.querySelector('.theme-toggle').textContent = '☀️';
+        }
+
+        // Initialize
+        updateStreak();
         renderNotes();
         updateStats();
     </script>
