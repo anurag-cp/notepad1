@@ -156,6 +156,7 @@
                 <button class="quick-mood" style="background: #f59e0b;" onclick="quickNote('😡 Frustrated today')">😡</button>
                 <button class="quick-mood" style="background: #ef4444;" onclick="quickNote('😢 Feeling down')">😢</button>
                 <button class="quick-mood" style="background: #6b7280;" onclick="quickNote('😰 Anxious')">😰</button>
+                <button class="quick-mood" style="background: #9ca3af;" onclick="quickNote('😐 Neutral - just checking in')">😐</button>
             </div>
             <div class="input-grid">
                 <input type="text" id="noteTitle" placeholder="What's on your mind?">
@@ -167,7 +168,7 @@
                     <option value="Mood">Mood Check</option>
                 </select>
                 <textarea id="noteText" placeholder="Write freely... AI analyzes emotions & gives advice" oninput="previewEmotion()"></textarea>
-                <button class="btn-primary" onclick="addNote()">✨ Add Note</button>
+                <button class="btn-primary" onclick="addNote()" id="addBtn">✨ Add Note</button>
                 <div id="emotionPreview" class="emotion-preview">Start typing for AI insights...</div>
             </div>
         </div>
@@ -193,31 +194,96 @@
         let currentStreak = 0;
 
         const emotionKeywords = {
-            happy: ['happy','great','awesome','love','excited','blessed','grateful','amazing','wonderful','joy','smile','laugh','fun','success','proud','mazza','achha','khushi','pyaar'],
-            sad: ['sad','depressed','crying','hurt','lonely','tired','down','upset','broken','pain','😢'],
-            angry: ['angry','furious','mad','enraged','livid','annoyed','frustrated','irritated','pissed','hate','😡'],
-            anxious: ['worried','stress','anxiety','scared','fear','panic','nervous','tense','overwhelmed','😰']
-        };
+    happy: [
+        'happy', 'great', 'awesome', 'love', 'excited', 'blessed', 'grateful', 'amazing', 'wonderful', 'joy', 
+        'smile', 'laugh', 'fun', 'success', 'proud', 'mazza', 'achha', 'khushi', 'pyaar', 'good', 
+        'nice', 'perfect', 'cheerful', 'content', 'delighted', 'ecstatic', 'elated', 'glad', 'joyful', 'jubilant', 
+        'lively', 'merry', 'optimistic', 'playful', 'radiant', 'rejoicing', 'thrilled', 'vibrant', 'blissful', 'buoyant', 
+        'carefree', 'chipper', 'convivial', 'exultant', 'favorable', 'gleeful', 'jolly', 'lighthearted', 'peppy', 'perky', 
+        'playful', 'sunny', 'upbeat', 'walking on air', 'tickled', 'euphoric', 'on cloud nine', 'overjoyed', 'contented', 'satisfied', 
+        'serene', 'animated', 'beaming', 'bliss', 'capering', 'charmed', 'delight', 'enraptured', 'exhilarated', 'festive', 
+        'frisky', 'gaiety', 'giddy', 'heartwarming', 'high spirits', 'insouciant', 'jaunty', 'jovial', 'mirthful', 'on top of the world', 
+        'peaceful', 'pleasant', 'pleased', 'rapturous', 'sparkling', 'spirited', 'splendid', 'stellar', 'superb', 'terrific', 
+        'unalloyed', 'unfettered', 'untroubled', 'vivacious', 'winning', 'zestful', 'zesty', 'paradisiacal', 'rapt', 'reveling'
+    ],
+    sad: [
+        'sad', 'depressed', 'crying', 'hurt', 'lonely', 'tired', 'down', 'upset', 'broken', 'pain', 
+        '😢', 'tear', 'cry', 'low', 'blue', 'miserable', 'sorrowful', 'dejected', 'unhappy', 'gloomy', 
+        'disheartened', 'heartbroken', 'melancholy', 'mournful', 'somber', 'woeful', 'desolate', 'despair', 'dismal', 'dreary', 
+        'forlorn', 'glum', 'heavyhearted', 'hopeless', 'lugubrious', 'pessimistic', 'pitiable', 'regretful', 'rejected', 'spiritless', 
+        'tearful', 'unfortunate', 'wretched', 'anguished', 'bereft', 'cheerless', 'crestfallen', 'crushed', 'despondent', 'disconsolate', 
+        'dispirited', 'doleful', 'downcast', 'downhearted', 'forlorn', 'grieved', 'heartsick', 'joyless', 'languishing', 'low-spirited', 
+        'oppressed', 'pained', 'pathetic', 'pitiable', 'rueful', 'saturnine', 'sullen', 'tragic', 'troubled', 'unlucky', 
+        'weeping', 'wistful', 'woebegone', 'aggrieved', 'bleak', 'blue', 'bummed', 'deplorable', 'depressing', 'dispiriting', 
+        'dolorous', 'funereal', 'grim', 'heart-rending', 'humiliated', 'infelicitous', 'lachrymose', 'morose', 'on the rocks', 'pensive', 
+        'shattered', 'sorrowed', 'stifled', 'sulky', 'tear-jerking', 'uncheerful', 'unhappy', 'weepy', 'withdrawn', 'worthless'
+    ],
+    angry: [
+        'angry', 'furious', 'mad', 'enraged', 'livid', 'annoyed', 'frustrated', 'irritated', 'pissed', 'hate', 
+        '😡', 'rage', 'fury', 'indignant', 'irate', 'resentful', 'bitter', 'hostile', 'incensed', 'infuriated', 
+        'cross', 'agitated', 'antagonistic', 'choleric', 'exasperated', 'fiery', 'grouchy', 'grumpy', 'ill-tempered', 'irascible', 
+        'ireful', 'outraged', 'querulous', 'seething', 'spiteful', 'surly', 'testy', 'vindicative', 'wrathful', 'acrimonious', 
+        'belligerent', 'boiling', 'bristling', 'burning', 'cantankerous', 'captious', 'chafed', 'crabby', 'displeased', 'envenomed', 
+        'fuming', 'galling', 'hateful', 'heated', 'hot-headed', 'huffy', 'incensed', 'inflamed', 'insulted', 'intolerant', 
+        'irritable', 'maddened', 'miffed', 'nettled', 'offended', 'piqued', 'provoked', 'rancorous', 'rankled', 'riled', 
+        'savage', 'sharp', 'short-tempered', 'snappy', 'snarky', 'splenetic', 'steamed', 'storming', 'sulky', 'sullen', 
+        'touchy', 'unappeased', 'unfriendly', 'uptight', 'vehement', 'venomous', 'vicious', 'violent', 'vitriolic', 'waspish', 
+        'wild', 'worked up', 'wroth', 'bad-tempered', 'bellicose', 'fractious', 'misanthropic', 'obnoxious', 'ornery', 'petulant'
+    ],
+    anxious: [
+        'worried', 'stress', 'anxiety', 'scared', 'fear', 'panic', 'nervous', 'tense', 'overwhelmed', '😰', 
+        'worry', 'afraid', 'nervous', 'apprehensive', 'jittery', 'uneasy', 'fretful', 'restless', 'shaky', 'uncertain', 
+        'alarmed', 'angst-ridden', 'bothered', 'concerned', 'disquieted', 'disturbed', 'edgy', 'fearful', 'fidgety', 'flustered', 
+        'hesitant', 'hysterical', 'insecure', 'intimidated', 'on edge', 'panicky', 'perturbed', 'rattled', 'skittish', 'suspicious', 
+        'timid', 'trepidation', 'unsettled', 'watchful', 'aghast', 'agitated', 'antsy', 'anxious', 'clutching', 'cowardly', 
+        'daunted', 'diffident', 'discomposed', 'distracted', 'distraught', 'dreading', 'faint-hearted', 'feverish', 'frightened', 'guilt-ridden', 
+        'hypervigilant', 'ill at ease', 'impatient', 'inhibited', 'irritable', 'jumpy', 'muddled', 'nauseous', 'obsessive', 'on tenterhooks', 
+        'over-excited', 'overwrought', 'panicked', 'paralysed', 'paranoid', 'precarious', 'preoccupied', 'quaking', 'quavering', 'reeling', 
+        'reticent', 'scared stiff', 'self-conscious', 'shaken', 'shrinking', 'solicitous', 'spooked', 'strained', 'stupefied', 'tentative', 
+        'terrified', 'threatened', 'timorous', 'trembling', 'troubled', 'unconfident', 'unnerved', 'unquiet', 'vigilant', 'waiting'
+    ],
+    neutral: [
+        'okay', 'fine', 'normal', 'alright', 'meh', 'average', 'neutral', 'regular', 'standard', 'usual', 
+        'nothing special', 'so so', '😐', 'indifferent', 'detached', 'unemotional', 'dispassionate', 'unbiased', 'objective', 'fair', 
+        'calm', 'collected', 'composed', 'cool', 'even-tempered', 'impartial', 'impassive', 'moderate', 'nonchalant', 'phlegmatic', 
+        'placid', 'quiet', 'relaxed', 'sedate', 'serene', 'steady', 'unconcerned', 'undisturbed', 'unexcited', 'unflappable', 
+        'unmoved', 'unruffled', 'aloof', 'apathetic', 'blank', 'casual', 'common', 'commonplace', 'controlled', 'customary', 
+        'deadpan', 'disinterested', 'distant', 'dry', 'everyday', 'habitual', 'halfhearted', 'impersonal', 'inactive', 'intermediate', 
+        'level-headed', 'listless', 'matter-of-fact', 'mediocre', 'middle-of-the-road', 'modest', 'mundane', 'non-committal', 'ordinary', 'passive', 
+        'patient', 'pedestrian', 'plain', 'prosaic', 'quotidian', 'reserved', 'routine', 'self-possessed', 'stable', 'stolid', 
+        'temperate', 'tolerable', 'typical', 'unaffected', 'unassuming', 'unbending', 'uncommitted', 'undemonstrative', 'uneventful', 'unimpressive', 
+        'uninvolved', 'unnoticeable', 'unobtrusive', 'unremarkable', 'unresponsive', 'unsentimental', 'unvarying', 'workaday', 'stale', 'static'
+    ]
+};
 
         const emotionColors = {
-            happy: '#10b981', sad: '#ef4444', angry: '#f59e0b', anxious: '#6b7280', neutral: '#9ca3af'
+            happy: '#10b981', 
+            sad: '#ef4444', 
+            angry: '#f59e0b', 
+            anxious: '#6b7280', 
+            neutral: '#9ca3af'
         };
 
         const adviceBank = {
-            happy: ["✨ Keep nurturing this positivity!", "🌟 What made you feel this way?", "😊 Share this joy with someone!", "🎉 Celebrate these moments!"],
-            sad: ["🤗 It's okay to feel this way.", "💙 Try 3 things you're grateful for.", "🌧️ This will pass. Breathe deeply.", "🫂 Reach out to someone you trust."],
-            angry: ["🔥 Take 3 deep breaths first.", "⚡ Step away for 5 minutes.", "💪 Channel this into action.", "🧘‍♂️ Try 4-7-8 breathing now."],
-            anxious: ["🧠 You're safe right now.", "☀️ Name 5 things you see.", "🌿 One step at a time.", "💫 You've handled this before."]
+            happy: ["✨ Keep nurturing this positivity!", "🌟 What made you feel this way?", "😊 Share this joy with someone!", "🎉 Celebrate these moments!", "💪 This energy is contagious!"],
+            sad: ["🤗 It's okay to feel this way.", "💙 Try 3 things you're grateful for.", "🌧️ This will pass. Breathe deeply.", "🫂 Reach out to someone you trust.", "🌈 Better days are coming."],
+            angry: ["🔥 Take 3 deep breaths first.", "⚡ Step away for 5 minutes.", "💪 Channel this into action.", "🧘‍♂️ Try 4-7-8 breathing now.", "📝 Write down what's bothering you."],
+            anxious: ["🧠 You're safe right now.", "☀️ Name 5 things you see.", "🌿 One step at a time.", "💫 You've handled this before.", "🌀 Focus on what you can control."],
+            neutral: ["⚖️ Balanced day - that's progress!", "📊 Consistency is key.", "🌡️ Nice neutral check-in!", "✅ Good to acknowledge the calm.", "🎯 Small steps build momentum."]
         };
 
         function detectEmotion(text) {
-            if (!text) return 'neutral';
+            if (!text.trim()) return 'neutral';
             const lowerText = text.toLowerCase();
             let scores = { happy: 0, sad: 0, angry: 0, anxious: 0, neutral: 0 };
             
             for (let emotion in emotionKeywords) {
-                scores[emotion] = emotionKeywords[emotion].filter(word => lowerText.includes(word)).length;
+                scores[emotion] = emotionKeywords[emotion].filter(word => 
+                    lowerText.includes(word)
+                ).length;
             }
+            
+            // Return emotion with highest score
             return Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
         }
 
@@ -228,6 +294,9 @@
             if (note.text.toLowerCase().includes('work') || note.text.toLowerCase().includes('boss')) {
                 advice = "💼 Work stress? Set one boundary today. " + advice;
             }
+            if (note.text.toLowerCase().includes('study') || note.text.toLowerCase().includes('exam')) {
+                advice = "📚 Study session? Take regular breaks. " + advice;
+            }
             return advice;
         }
 
@@ -235,9 +304,14 @@
             const text = document.getElementById('noteText').value;
             const emotion = detectEmotion(text);
             const preview = document.getElementById('emotionPreview');
-            preview.innerHTML = `AI detected: <strong style="color: ${emotionColors[emotion]}">${emotion.toUpperCase()}</strong> 😊`;
+            preview.innerHTML = `AI detected: <strong style="color: ${emotionColors[emotion]}">${emotion.toUpperCase()}</strong> ${getEmoji(emotion)}`;
             preview.style.borderColor = emotionColors[emotion];
             preview.style.background = emotionColors[emotion] + '20';
+        }
+
+        function getEmoji(emotion) {
+            const emojis = { happy: '😊', sad: '😢', angry: '😡', anxious: '😰', neutral: '😐' };
+            return emojis[emotion] || '😊';
         }
 
         function quickNote(quickText) {
@@ -257,49 +331,97 @@
             const category = document.getElementById('noteCategory').value;
             const text = document.getElementById('noteText').value.trim();
 
-            if (!title && !text) return alert('Please write something!');
+            if (!title && !text) {
+                alert('Please write something!');
+                return;
+            }
 
-            const emotion = detectEmotion(text);
+            const emotion = detectEmotion(text || title);
             const note = {
                 id: Date.now(),
                 title: title || 'Quick Note',
-                category, text, emotion,
-                advice: generateAdvice({text, emotion}),
+                category, 
+                text, 
+                emotion,
+                advice: generateAdvice({text: text || title, emotion}),
                 date: new Date().toLocaleString('en-IN', {
-                    weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
-                    hour: '2-digit', minute: '2-digit'
+                    weekday: 'short', 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric',
+                    hour: '2-digit', 
+                    minute: '2-digit'
                 }),
                 created: new Date().toDateString()
             };
 
             if (editIndex >= 0) {
-                notes[editIndex] = note; editIndex = -1;
-                document.querySelector('.btn-primary').textContent = '✨ Add Note';
+                notes[editIndex] = note; 
+                editIndex = -1;
+                document.getElementById('addBtn').textContent = '✨ Add Note';
+                document.getElementById('addBtn').className = 'btn-primary';
             } else {
                 notes.unshift(note);
                 updateStreak();
             }
 
+            // Reset form
             document.getElementById('noteTitle').value = '';
             document.getElementById('noteText').value = '';
             document.getElementById('noteCategory').value = 'Daily';
-            document.getElementById('emotionPreview').textContent = 'Start typing for AI insights...';
+            document.getElementById('emotionPreview').innerHTML = 'Start typing for AI insights...';
+            document.getElementById('emotionPreview').style.borderColor = 'rgba(255,255,255,0.2)';
+            document.getElementById('emotionPreview').style.background = 'rgba(255,255,255,0.1)';
+            
             saveNotes();
+        }
+
+        function editNote(index) {
+            const note = notes[index];
+            document.getElementById('noteTitle').value = note.title;
+            document.getElementById('noteCategory').value = note.category;
+            document.getElementById('noteText').value = note.text;
+            previewEmotion();
+            editIndex = index;
+            document.getElementById('addBtn').textContent = '💾 Update Note';
+        }
+
+        function deleteNote(index) {
+            if (confirm('Delete this note?')) {
+                notes.splice(index, 1);
+                saveNotes();
+            }
         }
 
         function updateStreak() {
             const today = new Date().toDateString();
             const yesterday = new Date(Date.now() - 86400000).toDateString();
-            const recentNotes = notes.filter(n => n.created === today || n.created === yesterday);
-            currentStreak = recentNotes.length >= 2 ? currentStreak + 1 : 1;
+            const todayNotes = notes.filter(n => n.created === today).length;
+            
+            if (todayNotes > 0) {
+                const yesterdayNotes = notes.filter(n => n.created === yesterday).length;
+                currentStreak = yesterdayNotes > 0 ? currentStreak + 1 : 1;
+            }
         }
 
         function renderNotes() {
-            document.getElementById('notesContainer').innerHTML = notes.map((note, index) => `
+            const container = document.getElementById('notesContainer');
+            if (notes.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                        <div style="font-size: 4em; margin-bottom: 20px;">📝</div>
+                        <div style="font-size: 1.2em; margin-bottom: 10px;">No notes yet</div>
+                        <div>Create your first emotion journal entry above!</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = notes.map((note, index) => `
                 <div class="note-item">
                     <div class="note-header">
                         <div class="emotion-badge" style="background: ${emotionColors[note.emotion]}">
-                            ${note.emotion.toUpperCase()}
+                            ${note.emotion.toUpperCase()} ${getEmoji(note.emotion)}
                         </div>
                         <div style="flex: 1;">
                             <div class="note-title">${note.title}</div>
@@ -308,9 +430,9 @@
                     </div>
                     <div class="note-text">${note.text}</div>
                     <div class="note-advice">💡 ${note.advice}</div>
-                    <div style="margin-top: 16px; display: flex; gap: 12px;">
-                        <button class="btn-primary" style="padding: 8px 16px; font-size: 14px;" onclick="editNote(${index})">Edit</button>
-                        <button onclick="deleteNote(${index})" style="background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer;">Delete</button>
+                    <div style="margin-top: 16px; display: flex; gap: 12px; flex-wrap: wrap;">
+                        <button class="btn-primary" style="padding: 8px 16px; font-size: 14px;" onclick="editNote(${index})">✏️ Edit</button>
+                        <button onclick="deleteNote(${index})" style="background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 14px;">🗑️ Delete</button>
                     </div>
                 </div>
             `).join('');
@@ -321,8 +443,11 @@
             const today = notes.filter(n => n.created === new Date().toDateString()).length;
             document.getElementById('totalNotes').textContent = `Total: ${total}`;
             document.getElementById('todayNotes').textContent = `Today: ${today}`;
-            document.getElementById('streakRing').textContent = `${Math.min(currentStreak, 30)}🔥`;
-            document.getElementById('streakRing').style.background = `conic-gradient(#10b981 0deg ${currentStreak*12}deg, #6b7280 ${currentStreak*12}deg 360deg)`;
+            
+            const streakRing = document.getElementById('streakRing');
+            streakRing.textContent = `${Math.min(currentStreak, 30)}🔥`;
+            const angle = Math.min(currentStreak * 12, 360);
+            streakRing.style.background = `conic-gradient(#10b981 0deg ${angle}deg, #6b7280 ${angle}deg 360deg)`;
         }
 
         function toggleTheme() {
@@ -333,12 +458,18 @@
         }
 
         function exportNotes() {
+            if (notes.length === 0) {
+                alert('No notes to export!');
+                return;
+            }
             const dataStr = JSON.stringify(notes, null, 2);
             const dataBlob = new Blob([dataStr], {type: 'application/json'});
             const url = URL.createObjectURL(dataBlob);
             const link = document.createElement('a');
-            link.href = url; link.download = `mind-ease-backup-${new Date().toISOString().slice(0,10)}.json`;
+            link.href = url; 
+            link.download = `mind-ease-backup-${new Date().toISOString().slice(0,10)}.json`;
             link.click();
+            URL.revokeObjectURL(url);
         }
 
         // Event listeners
